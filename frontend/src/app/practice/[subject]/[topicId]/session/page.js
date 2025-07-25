@@ -31,43 +31,23 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 
-// Sample questions data
+// Import question banks
+import { mathematicsQuestions } from '@/data/questions/mathematicsQuestions';
+import { scienceQuestions } from '@/data/questions/scienceQuestions';
+
+// Combined questions from all subjects
 const sampleQuestions = {
   objective: [
-    {
-      id: 1,
-      question: "What is the value of x in the equation 2x + 5 = 13?",
-      options: ["x = 3", "x = 4", "x = 5", "x = 6"],
-      correctAnswer: 1,
-      hint: "First, subtract 5 from both sides of the equation.",
-      explanation: "Solving: 2x + 5 = 13 → 2x = 8 → x = 4"
-    },
-    {
-      id: 2,
-      question: "Which of the following is a prime number?",
-      options: ["15", "21", "23", "27"],
-      correctAnswer: 2,
-      hint: "A prime number has exactly two factors: 1 and itself.",
-      explanation: "23 is prime because it has no divisors other than 1 and itself."
-    }
+    // Mathematics questions
+    ...mathematicsQuestions.objective,
+    // Science questions
+    ...scienceQuestions.objective,
   ],
   subjective: [
-    {
-      id: 1,
-      question: "Solve the quadratic equation x² - 5x + 6 = 0 and verify your answer.",
-      expectedAnswer: "x = 2, x = 3",
-      hint: "Try factoring the quadratic expression or use the quadratic formula.",
-      explanation: "Using factoring: (x-2)(x-3) = 0, so x = 2 or x = 3. Verification: (2)² - 5(2) + 6 = 0 ✓",
-      keyWords: ["x = 2", "x = 3", "factoring", "(x-2)(x-3)", "verification"]
-    },
-    {
-      id: 2,
-      question: "Explain the difference between rational and irrational numbers with examples.",
-      expectedAnswer: "Rational numbers can be expressed as fractions, irrational cannot",
-      hint: "Think about numbers that can be written as a/b where a and b are integers.",
-      explanation: "Rational: 1/2, 0.75, 3 (can be expressed as fractions). Irrational: √2, π, e (cannot be expressed as fractions)",
-      keyWords: ["rational", "irrational", "fractions", "a/b", "integers", "√2", "π"]
-    }
+    // Mathematics questions
+    ...mathematicsQuestions.subjective,
+    // Science questions
+    ...scienceQuestions.subjective,
   ]
 };
 
