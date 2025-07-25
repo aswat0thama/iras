@@ -34,14 +34,53 @@ import Navbar from '@/components/layout/Navbar';
 // Import question banks
 import { mathematicsQuestions } from '@/data/questions/mathematicsQuestions';
 import { scienceQuestions } from '@/data/questions/scienceQuestions';
-import { englishQuestions } from '@/data/questions/englishQuestions';
+import { optionalMathematicsQuestions } from '@/data/questions/optionalMathematicsQuestions';
 
-// Question bank mapping
-const questionBanks = {
-  mathematics: mathematicsQuestions,
-  science: scienceQuestions,
-  english: englishQuestions,
-  // Add other subjects as needed
+// Combined questions from all subjects
+const sampleQuestions = {
+  objective: [
+    // Mathematics questions
+    ...mathematicsQuestions.objective,
+    // Science questions
+    ...scienceQuestions.objective,
+    // Optional Mathematics questions
+    ...optionalMathematicsQuestions.objective,
+  ],
+  subjective: [
+    // Mathematics questions
+    ...mathematicsQuestions.subjective,
+    // Science questions
+    ...scienceQuestions.subjective,
+    // Optional Mathematics questions
+    ...optionalMathematicsQuestions.subjective,
+  ]
+};
+
+// Function to get questions filtered by subject, topic, and difficulty
+const getFilteredQuestions = (subject, topicId, type, difficulty) => {
+  let questions = [];
+  
+  // Get all questions of the specified type
+  const allQuestions = sampleQuestions[type] || [];
+  
+  // Filter by subject if needed (for better organization)
+  let subjectQuestions = allQuestions;
+  if (subject) {
+    // You can add subject-specific filtering here if questions have subject metadata
+    // For now, we'll use topic-based filtering which is more granular
+  }
+  
+  // Filter by topic
+  if (topicId) {
+    subjectQuestions = subjectQuestions.filter(q => q.topic === topicId);
+  }
+  
+  // Filter by difficulty
+  if (difficulty && difficulty !== 'all') {
+    subjectQuestions = subjectQuestions.filter(q => q.difficulty === difficulty);
+  }
+  
+  return subjectQuestions;
 };
 
 export default function PracticeSessionPage() {
@@ -63,25 +102,7 @@ export default function PracticeSessionPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeLeft, setTimeLeft] = useState(1200); // 20 minutes in seconds
 
-  // Function to get filtered questions based on subject, topic, and difficulty
-  const getFilteredQuestions = (subject, topicId, type, difficulty) => {
-    const subjectQuestions = questionBanks[subject];
-    
-    if (!subjectQuestions || !subjectQuestions[type]) {
-      return [];
-    }
-    
-    const allQuestions = subjectQuestions[type];
-    
-    // Filter by topic and difficulty
-    return allQuestions.filter(question => {
-      const topicMatch = question.topic === topicId;
-      const difficultyMatch = !difficulty || question.difficulty === difficulty;
-      return topicMatch && difficultyMatch;
-    });
-  };
-
-  // Get filtered questions
+  // Get filtered questions based on subject, topic, and difficulty
   const questions = getFilteredQuestions(subject, topicId, type, difficulty);
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
@@ -92,15 +113,32 @@ export default function PracticeSessionPage() {
   // Timer effect
   useEffect(() => {
     if (timeLeft > 0 && !isSubmitted) {
-      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [timeLeft, isSubmitted]);
 
+  // Format time display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Handle answer changes
+  const handleAnswerChange = (value) => {
+    setAnswers({
+      ...answers,
+      [currentQuestion.id]: value
+    });
+  };
+
   // Handle file upload
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
-    if (file && currentQuestion) {
+    if (file) {
       setUploadedFiles({
         ...uploadedFiles,
         [currentQuestion.id]: file
@@ -108,11 +146,18 @@ export default function PracticeSessionPage() {
     }
   };
 
-  // Handle answer submission
-  const handleSubmitAnswer = () => {
-    if (currentQuestion) {
-      setSubmittedQuestions(new Set([...submittedQuestions, currentQuestion.id]));
+  // Submit current question
+  const handleSubmitQuestion = () => {
+    const hasAnswer = type === 'objective' 
+      ? answers[currentQuestion.id] !== undefined
+      : answers[currentQuestion.id] || uploadedFiles[currentQuestion.id];
+
+    if (!hasAnswer) {
+      alert('Please provide an answer before submitting.');
+      return;
     }
+
+    setSubmittedQuestions(new Set([...submittedQuestions, currentQuestion.id]));
   };
 
   // Check objective answer
@@ -120,19 +165,19 @@ export default function PracticeSessionPage() {
     const isCorrect = selectedAnswer === question.correctAnswer;
     return {
       isCorrect,
-      score: isCorrect ? 100 : 0,
-      feedback: isCorrect ? "Correct! Well done." : "Incorrect. Try again or check the explanation."
+      message: isCorrect ? 'Correct! Well done.' : 'Incorrect. Try to understand the concept better.',
+      score: isCorrect ? 100 : 0
     };
   };
 
   // Check subjective answer (basic keyword matching)
   const checkSubjectiveAnswer = (userAnswer, question) => {
-    if (!userAnswer || userAnswer.trim().length < 10) {
+    if (!userAnswer || !question.keyWords) {
       return {
+        isCorrect: false,
+        message: 'Please provide an answer.',
         score: 0,
-        feedback: "Answer is too short. Please provide a more detailed response.",
-        foundKeywords: [],
-        totalKeywords: question.keyWords?.length || 0
+        feedback: 'No answer provided.'
       };
     }
 
@@ -141,14 +186,12 @@ export default function PracticeSessionPage() {
     const foundKeywords = keyWords.filter(keyword => 
       userText.includes(keyword.toLowerCase())
     );
-    
-    const score = (foundKeywords.length / keyWords.length) * 100;
+
+    const score = Math.round((foundKeywords.length / keyWords.length) * 100);
     
     let feedback;
     if (score >= 80) {
-      feedback = "Excellent answer! You covered all key concepts.";
-    } else if (score >= 70) {
-      feedback = "Very good answer! Your answer covers most key concepts.";
+      feedback = "Excellent! Your answer covers most key concepts.";
     } else if (score >= 60) {
       feedback = "Good answer! Consider including more details.";
     } else if (score >= 40) {
@@ -160,6 +203,7 @@ export default function PracticeSessionPage() {
     return { score, feedback, foundKeywords, totalKeywords: keyWords.length };
   };
 
+  // Check answer function
   const handleCheckAnswer = () => {
     const hasAnswer = type === 'objective' 
       ? answers[currentQuestion.id] !== undefined
@@ -189,6 +233,7 @@ export default function PracticeSessionPage() {
     });
   };
 
+  // Show/hide hint
   const handleShowHint = () => {
     setShowHint({
       ...showHint,
@@ -196,6 +241,7 @@ export default function PracticeSessionPage() {
     });
   };
 
+  // Show/hide explanation
   const handleShowExplanation = () => {
     setShowExplanation({
       ...showExplanation,
@@ -210,6 +256,7 @@ export default function PracticeSessionPage() {
     });
   };
 
+  // Navigation functions
   const handleNext = () => {
     if (!isLastQuestion) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -222,6 +269,7 @@ export default function PracticeSessionPage() {
     }
   };
 
+  // Submit entire practice
   const handleSubmitPractice = () => {
     setIsSubmitted(true);
     // Show explanations for all questions
@@ -232,54 +280,25 @@ export default function PracticeSessionPage() {
     setShowExplanation(allExplanations);
   };
 
+  // Get answered questions count
   const getAnsweredCount = () => {
     return submittedQuestions.size;
   };
 
   const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  // Format time display
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  // Get subject display name
+  const getSubjectDisplayName = (subjectKey) => {
+    const subjectNames = {
+      'mathematics': 'Mathematics',
+      'optional-mathematics': 'Optional Mathematics',
+      'science': 'Science',
+      'english': 'English'
+    };
+    return subjectNames[subjectKey] || subjectKey;
   };
 
   // Handle case when no questions are available
-  if (!questions.length) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar />
-        <div className="p-8">
-          <div className="max-w-2xl mx-auto text-center">
-            <Card>
-              <CardContent className="p-8">
-                <XCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                <h2 className="text-xl font-semibold mb-4">No Questions Available</h2>
-                <p className="text-gray-600 mb-4">
-                  Questions for <strong>{subject}</strong> - <strong>{topicId}</strong> 
-                  {difficulty && ` (${difficulty} difficulty)`} are not available yet.
-                </p>
-                <div className="space-y-2 text-sm text-gray-500 mb-6">
-                  <p>Subject: {subject}</p>
-                  <p>Topic: {topicId}</p>
-                  <p>Type: {type}</p>
-                  <p>Difficulty: {difficulty || 'All'}</p>
-                </div>
-                <Link href={`/practice/${subject}/${topicId}`}>
-                  <Button>
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Topic Selection
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (!currentQuestion) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -288,8 +307,19 @@ export default function PracticeSessionPage() {
           <div className="max-w-2xl mx-auto text-center">
             <Card>
               <CardContent className="p-8">
-                <h2 className="text-xl font-semibold mb-4">Loading Question...</h2>
-                <p className="text-gray-600">Please wait while we load your question.</p>
+                <h2 className="text-xl font-semibold mb-4">No Questions Available</h2>
+                <p className="text-gray-600 mb-4">
+                  Questions for this topic and difficulty level are not available yet.
+                </p>
+                <p className="text-sm text-gray-500 mb-6">
+                  Subject: {getSubjectDisplayName(subject)} | Topic: {topicId} | Type: {type} | Difficulty: {difficulty}
+                </p>
+                <Button asChild>
+                  <Link href={`/courses/grade-10/${subject}`}>
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to Concept Map
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -302,169 +332,186 @@ export default function PracticeSessionPage() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <main className="p-4 lg:p-8">
-        {/* Header */}
-        <div className="max-w-4xl mx-auto mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <Link href={`/practice/${subject}/${topicId}`}>
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Topic
-              </Button>
-            </Link>
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary">
-                {subject.charAt(0).toUpperCase() + subject.slice(1)}
-              </Badge>
-              <Badge variant="outline">
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </Badge>
-              {difficulty && (
-                <Badge variant="outline">
-                  {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Progress and Timer */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </span>
-              <Progress value={progressPercentage} className="w-48" />
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="w-4 h-4" />
-              <span className={timeLeft < 300 ? 'text-red-600 font-medium' : ''}>
-                {formatTime(timeLeft)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Question Card */}
+      <main className="p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-4">
+              <Button variant="outline" asChild>
+                <Link href={`/practice/${subject}/${topicId}`}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back
+                </Link>
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Practice Session
+                </h1>
+                <p className="text-gray-600">
+                  {getSubjectDisplayName(subject)} • {type.charAt(0).toUpperCase() + type.slice(1)} Questions
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="w-4 h-4" />
+                <span className={timeLeft < 300 ? 'text-red-600 font-semibold' : 'text-gray-600'}>
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
+              <Badge variant="outline">
+                {currentQuestionIndex + 1} / {questions.length}
+              </Badge>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-gray-700">Progress</span>
+              <span className="text-sm text-gray-500">
+                {getAnsweredCount()} of {questions.length} submitted
+              </span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+          </div>
+
+          {/* Question Card */}
           <Card className="mb-6">
             <CardHeader>
-              <div className="flex items-start justify-between">
+              <div className="flex justify-between items-start">
                 <CardTitle className="text-lg">
-                  {currentQuestion.question}
+                  Question {currentQuestionIndex + 1}
                 </CardTitle>
                 <div className="flex gap-2">
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant={currentQuestion.difficulty === 'easy' ? 'default' : 
+                                 currentQuestion.difficulty === 'medium' ? 'secondary' : 'destructive'}>
                     {currentQuestion.difficulty}
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
-                    {currentQuestion.topic}
-                  </Badge>
+                  {isCurrentQuestionSubmitted && (
+                    <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Submitted
+                    </Badge>
+                  )}
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              {/* Objective Questions */}
-              {type === 'objective' && (
-                <RadioGroup
-                  value={answers[currentQuestion.id]?.toString()}
-                  onValueChange={(value) => setAnswers({
-                    ...answers,
-                    [currentQuestion.id]: parseInt(value)
-                  })}
-                  disabled={isCurrentQuestionChecked}
-                >
-                  {currentQuestion.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-50">
-                      <RadioGroupItem value={index.toString()} id={`option-${index}`} />
-                      <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
-                        {option}
-                      </Label>
-                      {isCurrentQuestionChecked && index === currentQuestion.correctAnswer && (
-                        <CheckCircle className="w-5 h-5 text-green-600" />
-                      )}
-                      {isCurrentQuestionChecked && 
-                       index === answers[currentQuestion.id] && 
-                       index !== currentQuestion.correctAnswer && (
-                        <X className="w-5 h-5 text-red-600" />
-                      )}
-                    </div>
-                  ))}
-                </RadioGroup>
-              )}
+            <CardContent className="space-y-4">
+              {/* Question Text */}
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-gray-800 leading-relaxed">
+                  {currentQuestion.question}
+                </p>
+              </div>
 
-              {/* Subjective Questions */}
-              {type === 'subjective' && (
+              {/* Answer Section */}
+              {type === 'objective' ? (
+                // Objective Question
+                <div className="space-y-3">
+                  <RadioGroup
+                    value={answers[currentQuestion.id]?.toString() || ''}
+                    onValueChange={(value) => handleAnswerChange(parseInt(value))}
+                    disabled={isCurrentQuestionSubmitted}
+                  >
+                    {currentQuestion.options.map((option, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <RadioGroupItem value={index.toString()} id={`option-${index}`} />
+                        <Label htmlFor={`option-${index}`} className="cursor-pointer">
+                          {option}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              ) : (
+                // Subjective Question
                 <div className="space-y-4">
                   <Textarea
-                    placeholder="Type your answer here..."
+                    placeholder="Write your answer here..."
                     value={answers[currentQuestion.id] || ''}
-                    onChange={(e) => setAnswers({
-                      ...answers,
-                      [currentQuestion.id]: e.target.value
-                    })}
-                    disabled={isCurrentQuestionChecked}
+                    onChange={(e) => handleAnswerChange(e.target.value)}
+                    disabled={isCurrentQuestionSubmitted}
                     rows={6}
+                    className="resize-none"
                   />
                   
                   {/* File Upload */}
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-                    <div className="text-center">
-                      <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 mb-2">
-                        Upload handwritten solution or diagram
-                      </p>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
                       <input
                         type="file"
-                        accept="image/*"
+                        id="file-upload"
+                        accept="image/*,.pdf"
                         onChange={handleFileUpload}
                         className="hidden"
-                        id="file-upload"
-                        disabled={isCurrentQuestionChecked}
+                        disabled={isCurrentQuestionSubmitted}
                       />
-                      <Label htmlFor="file-upload">
-                        <Button variant="outline" size="sm" asChild>
-                          <span>
-                            <Camera className="w-4 h-4 mr-2" />
-                            Choose File
-                          </span>
-                        </Button>
-                      </Label>
-                      {uploadedFiles[currentQuestion.id] && (
-                        <p className="text-sm text-green-600 mt-2">
-                          File uploaded: {uploadedFiles[currentQuestion.id].name}
-                        </p>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('file-upload').click()}
+                        disabled={isCurrentQuestionSubmitted}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload File
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={isCurrentQuestionSubmitted}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        Take Photo
+                      </Button>
                     </div>
+                    {uploadedFiles[currentQuestion.id] && (
+                      <span className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle className="w-4 h-4" />
+                        File uploaded: {uploadedFiles[currentQuestion.id].name}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
 
-              {/* Answer Result */}
-              {showAnswerCheck[currentQuestion.id] && answerResults[currentQuestion.id] && (
-                <Alert className={`mt-4 ${answerResults[currentQuestion.id].isCorrect ? 'border-green-200' : 'border-yellow-200'}`}>
-                  <AlertDescription>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium">
-                        {type === 'objective' ? (
-                          answerResults[currentQuestion.id].isCorrect ? 'Correct!' : 'Incorrect'
-                        ) : (
-                          `Score: ${Math.round(answerResults[currentQuestion.id].score)}%`
-                        )}
-                      </span>
-                    </div>
-                    <p>{answerResults[currentQuestion.id].feedback}</p>
-                    {type === 'subjective' && answerResults[currentQuestion.id].foundKeywords && (
-                      <div className="mt-2 text-sm">
-                        <p>Keywords found: {answerResults[currentQuestion.id].foundKeywords.length}/{answerResults[currentQuestion.id].totalKeywords}</p>
-                      </div>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2 pt-4 border-t">
+                {!isCurrentQuestionSubmitted && (
+                  <Button onClick={handleSubmitQuestion}>
+                    <Send className="w-4 h-4 mr-2" />
+                    Submit Answer
+                  </Button>
+                )}
+                
+                {isCurrentQuestionSubmitted && !isCurrentQuestionChecked && (
+                  <Button onClick={handleCheckAnswer} variant="outline">
+                    <Search className="w-4 h-4 mr-2" />
+                    Check Answer
+                  </Button>
+                )}
+
+                <Button
+                  variant="outline"
+                  onClick={handleShowHint}
+                  disabled={showHint[currentQuestion.id]}
+                >
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  {showHint[currentQuestion.id] ? 'Hint Shown' : 'Show Hint'}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={showExplanation[currentQuestion.id] ? handleHideExplanation : handleShowExplanation}
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  {showExplanation[currentQuestion.id] ? 'Hide Explanation' : 'Show Explanation'}
+                </Button>
+              </div>
 
               {/* Hint */}
               {showHint[currentQuestion.id] && (
-                <Alert className="mt-4 border-blue-200">
+                <Alert>
                   <Lightbulb className="w-4 h-4" />
                   <AlertDescription>
                     <strong>Hint:</strong> {currentQuestion.hint}
@@ -472,101 +519,118 @@ export default function PracticeSessionPage() {
                 </Alert>
               )}
 
+              {/* Answer Check Result */}
+              {showAnswerCheck[currentQuestion.id] && answerResults[currentQuestion.id] && (
+                <Alert className={answerResults[currentQuestion.id].isCorrect || answerResults[currentQuestion.id].score >= 60 ? 
+                  'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+                  <div className="flex items-start gap-2">
+                    {answerResults[currentQuestion.id].isCorrect || answerResults[currentQuestion.id].score >= 60 ? 
+                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" /> : 
+                      <XCircle className="w-4 h-4 text-red-600 mt-0.5" />
+                    }
+                    <div>
+                      <AlertDescription>
+                        <strong>Result:</strong> {answerResults[currentQuestion.id].message || answerResults[currentQuestion.id].feedback}
+                        {answerResults[currentQuestion.id].score !== undefined && (
+                          <div className="mt-1">
+                            <strong>Score:</strong> {answerResults[currentQuestion.id].score}%
+                            {answerResults[currentQuestion.id].foundKeywords && (
+                              <span className="text-sm text-gray-600 ml-2">
+                                ({answerResults[currentQuestion.id].foundKeywords.length}/{answerResults[currentQuestion.id].totalKeywords} key concepts found)
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </AlertDescription>
+                    </div>
+                  </div>
+                </Alert>
+              )}
+
               {/* Explanation */}
               {showExplanation[currentQuestion.id] && (
-                <Alert className="mt-4 border-gray-200">
+                <Alert className="border-blue-200 bg-blue-50">
                   <BookOpen className="w-4 h-4" />
                   <AlertDescription>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <strong>Explanation:</strong>
-                        <p className="mt-1">{currentQuestion.explanation}</p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleHideExplanation}
-                        className="ml-2"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
+                    <strong>Explanation:</strong> {currentQuestion.explanation}
                   </AlertDescription>
                 </Alert>
               )}
             </CardContent>
           </Card>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
-            <div className="flex gap-2">
-              {!isCurrentQuestionChecked && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShowHint}
-                    disabled={showHint[currentQuestion.id]}
-                  >
-                    <Lightbulb className="w-4 h-4 mr-1" />
-                    Hint
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCheckAnswer}
-                  >
-                    <Check className="w-4 h-4 mr-1" />
-                    Check Answer
-                  </Button>
-                </>
-              )}
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleShowExplanation}
-                disabled={showExplanation[currentQuestion.id]}
-              >
-                <BookOpen className="w-4 h-4 mr-1" />
-                Show Explanation
-              </Button>
-            </div>
+          {/* Navigation */}
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              onClick={handlePrevious}
+              disabled={isFirstQuestion}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Previous
+            </Button>
 
-            <div className="flex gap-2">
+            {isLastQuestion ? (
               <Button
-                variant="outline"
-                onClick={handlePrevious}
-                disabled={isFirstQuestion}
+                onClick={handleSubmitPractice}
+                disabled={isSubmitted}
+                className="bg-red-600 hover:bg-red-700"
               >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                Previous
+                <CheckCircle className="w-4 h-4 mr-2" />
+                {isSubmitted ? 'Practice Completed' : 'Finish Practice'}
               </Button>
-              
-              {!isLastQuestion ? (
-                <Button onClick={handleNext}>
-                  Next
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              ) : (
-                <Button onClick={handleSubmitPractice} disabled={isSubmitted}>
-                  <Send className="w-4 h-4 mr-1" />
-                  Submit Practice
-                </Button>
-              )}
-            </div>
+            ) : (
+              <Button onClick={handleNext}>
+                Next
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            )}
           </div>
 
-          {/* Practice Summary */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between text-sm">
-                <span>Progress: {getAnsweredCount()}/{questions.length} answered</span>
-                <span>Topic: {topicId}</span>
-                <span>Time remaining: {formatTime(timeLeft)}</span>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Summary at the end */}
+          {isSubmitted && (
+            <Card className="mt-8 border-green-200 bg-green-50">
+              <CardHeader>
+                <CardTitle className="text-lg text-green-800">
+                  Practice Session Completed! 🎉
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-green-700">
+                      {getAnsweredCount()}
+                    </div>
+                    <div className="text-sm text-green-600">Questions Submitted</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-blue-700">
+                      {formatTime(1200 - timeLeft)}
+                    </div>
+                    <div className="text-sm text-blue-600">Time Spent</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {Math.round((getAnsweredCount() / questions.length) * 100)}%
+                    </div>
+                    <div className="text-sm text-purple-600">Completion Rate</div>
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-2 justify-center">
+                  <Button asChild>
+                    <Link href={`/courses/grade-10/${subject}`}>
+                      Back to Concept Map
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link href={`/practice/${subject}/${topicId}`}>
+                      Practice Again
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </main>
     </div>

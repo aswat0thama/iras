@@ -1,7 +1,7 @@
 // Science questions for Grade 10 SEE Board
 export const scienceQuestions = {
   objective: [
-    // Light Questions
+    // Light Chapter Questions
     {
       id: 'light-obj-1',
       question: "What is the speed of light in vacuum?",
@@ -23,7 +23,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
     
-    // Sound Questions
+    // Sound Chapter Questions
     {
       id: 'sound-obj-1',
       question: "What is the unit of frequency?",
@@ -45,7 +45,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
 
-    // Electricity Questions
+    // Electricity Chapter Questions
     {
       id: 'electricity-obj-1',
       question: "Which law states that 'current is directly proportional to voltage'?",
@@ -67,7 +67,7 @@ export const scienceQuestions = {
       difficulty: 'easy'
     },
 
-    // Acids and Bases Questions
+    // Acids and Bases Chapter Questions
     {
       id: 'acids-bases-obj-1',
       question: "What is the pH of pure water at 25°C?",
@@ -89,7 +89,7 @@ export const scienceQuestions = {
       difficulty: 'easy'
     },
 
-    // Metals and Non-metals Questions
+    // Metals and Non-metals Chapter Questions
     {
       id: 'metals-nonmetals-obj-1',
       question: "Which gas is produced when zinc reacts with hydrochloric acid?",
@@ -111,7 +111,7 @@ export const scienceQuestions = {
       difficulty: 'easy'
     },
 
-    // Carbon Compounds Questions
+    // Carbon Compounds Chapter Questions
     {
       id: 'carbon-compounds-obj-1',
       question: "What is the molecular formula of methane?",
@@ -133,7 +133,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
 
-    // Life Processes Questions
+    // Life Processes Chapter Questions
     {
       id: 'life-processes-obj-1',
       question: "Which gas is released during photosynthesis?",
@@ -155,7 +155,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
 
-    // Environment Questions
+    // Environment Chapter Questions
     {
       id: 'environment-obj-1',
       question: "Which compound is primarily responsible for ozone layer depletion?",
@@ -179,7 +179,7 @@ export const scienceQuestions = {
   ],
 
   subjective: [
-    // Light Questions
+    // Light Chapter Questions
     {
       id: 'light-subj-1',
       question: "Explain the difference between real and virtual images. Give two examples of each.",
@@ -201,7 +201,7 @@ export const scienceQuestions = {
       difficulty: 'hard'
     },
 
-    // Electricity Questions
+    // Electricity Chapter Questions
     {
       id: 'electricity-subj-1',
       question: "State and explain Ohm's law. Draw a circuit diagram to verify it.",
@@ -223,7 +223,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
 
-    // Acids and Bases Questions
+    // Acids and Bases Chapter Questions
     {
       id: 'acids-bases-subj-1',
       question: "What are acids and bases? Explain their properties with examples.",
@@ -245,7 +245,7 @@ export const scienceQuestions = {
       difficulty: 'medium'
     },
 
-    // Metals and Non-metals Questions
+    // Metals and Non-metals Chapter Questions
     {
       id: 'metals-nonmetals-subj-1',
       question: "Explain the process of corrosion of iron. How can it be prevented?",
@@ -267,7 +267,7 @@ export const scienceQuestions = {
       difficulty: 'easy'
     },
 
-    // Life Processes Questions
+    // Life Processes Chapter Questions
     {
       id: 'life-processes-subj-1',
       question: "Explain the process of photosynthesis. Write the chemical equation.",
@@ -289,7 +289,7 @@ export const scienceQuestions = {
       difficulty: 'hard'
     },
 
-    // Environment Questions
+    // Environment Chapter Questions
     {
       id: 'environment-subj-1',
       question: "What is greenhouse effect? Explain its causes and consequences.",
