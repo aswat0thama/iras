@@ -2,7 +2,7 @@
 export const scienceNodes = [
   // Physics Topics
   {
-    id: 'physics-1',
+    id: 'light',
     type: 'custom',
     position: { x: 200, y: 50 },
     data: { 
@@ -17,7 +17,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'physics-2',
+    id: 'sound',
     type: 'custom',
     position: { x: 400, y: 50 },
     data: { 
@@ -32,7 +32,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'physics-3',
+    id: 'heat',
     type: 'custom',
     position: { x: 600, y: 50 },
     data: { 
@@ -47,7 +47,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'physics-4',
+    id: 'motion-force',
     type: 'custom',
     position: { x: 100, y: 200 },
     data: { 
@@ -62,7 +62,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'physics-5',
+    id: 'electricity',
     type: 'custom',
     position: { x: 300, y: 200 },
     data: { 
@@ -77,7 +77,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'physics-6',
+    id: 'magnetism',
     type: 'custom',
     position: { x: 500, y: 200 },
     data: { 
@@ -94,7 +94,7 @@ export const scienceNodes = [
 
   // Chemistry Topics
   {
-    id: 'chemistry-1',
+    id: 'acids-bases',
     type: 'custom',
     position: { x: 200, y: 350 },
     data: { 
@@ -109,7 +109,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'chemistry-2',
+    id: 'metals-nonmetals',
     type: 'custom',
     position: { x: 400, y: 350 },
     data: { 
@@ -124,7 +124,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'chemistry-3',
+    id: 'carbon-compounds',
     type: 'custom',
     position: { x: 600, y: 350 },
     data: { 
@@ -139,7 +139,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'chemistry-4',
+    id: 'chemical-reactions',
     type: 'custom',
     position: { x: 100, y: 500 },
     data: { 
@@ -154,7 +154,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'chemistry-5',
+    id: 'periodic-table',
     type: 'custom',
     position: { x: 300, y: 500 },
     data: { 
@@ -171,7 +171,7 @@ export const scienceNodes = [
 
   // Biology Topics
   {
-    id: 'biology-1',
+    id: 'life-processes',
     type: 'custom',
     position: { x: 800, y: 200 },
     data: { 
@@ -186,7 +186,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'biology-2',
+    id: 'heredity',
     type: 'custom',
     position: { x: 900, y: 350 },
     data: { 
@@ -201,7 +201,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'biology-3',
+    id: 'environment',
     type: 'custom',
     position: { x: 700, y: 500 },
     data: { 
@@ -216,7 +216,7 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'biology-4',
+    id: 'human-body',
     type: 'custom',
     position: { x: 800, y: 650 },
     data: { 
@@ -231,14 +231,14 @@ export const scienceNodes = [
     },
   },
   {
-    id: 'biology-5',
+    id: 'reproduction',
     type: 'custom',
     position: { x: 600, y: 650 },
     data: { 
-      label: 'Plant Kingdom', 
+      label: 'Reproduction', 
       progress: 60, 
       status: 'in-progress',
-      difficulty: 'easy',
+      difficulty: 'medium',
       questionsCount: 20,
       completedQuestions: 12,
       subject: 'science',
@@ -249,25 +249,26 @@ export const scienceNodes = [
 
 export const scienceEdges = [
   // Physics connections
-  { id: 'e-p1-p2', source: 'physics-1', target: 'physics-2', type: 'smoothstep' },
-  { id: 'e-p2-p3', source: 'physics-2', target: 'physics-3', type: 'smoothstep' },
-  { id: 'e-p1-p4', source: 'physics-1', target: 'physics-4', type: 'smoothstep' },
-  { id: 'e-p4-p5', source: 'physics-4', target: 'physics-5', type: 'smoothstep' },
-  { id: 'e-p5-p6', source: 'physics-5', target: 'physics-6', type: 'smoothstep' },
-
+  { id: 'e1-2', source: 'light', target: 'sound', type: 'smoothstep' },
+  { id: 'e2-3', source: 'sound', target: 'heat', type: 'smoothstep' },
+  { id: 'e1-4', source: 'light', target: 'motion-force', type: 'smoothstep' },
+  { id: 'e4-5', source: 'motion-force', target: 'electricity', type: 'smoothstep' },
+  { id: 'e5-6', source: 'electricity', target: 'magnetism', type: 'smoothstep' },
+  
   // Chemistry connections
-  { id: 'e-c1-c2', source: 'chemistry-1', target: 'chemistry-2', type: 'smoothstep' },
-  { id: 'e-c2-c3', source: 'chemistry-2', target: 'chemistry-3', type: 'smoothstep' },
-  { id: 'e-c1-c4', source: 'chemistry-1', target: 'chemistry-4', type: 'smoothstep' },
-  { id: 'e-c4-c5', source: 'chemistry-4', target: 'chemistry-5', type: 'smoothstep' },
-
+  { id: 'e7-8', source: 'acids-bases', target: 'metals-nonmetals', type: 'smoothstep' },
+  { id: 'e8-9', source: 'metals-nonmetals', target: 'carbon-compounds', type: 'smoothstep' },
+  { id: 'e7-10', source: 'acids-bases', target: 'chemical-reactions', type: 'smoothstep' },
+  { id: 'e10-11', source: 'chemical-reactions', target: 'periodic-table', type: 'smoothstep' },
+  
   // Biology connections
-  { id: 'e-b1-b2', source: 'biology-1', target: 'biology-2', type: 'smoothstep' },
-  { id: 'e-b2-b3', source: 'biology-2', target: 'biology-3', type: 'smoothstep' },
-  { id: 'e-b1-b4', source: 'biology-1', target: 'biology-4', type: 'smoothstep' },
-  { id: 'e-b3-b5', source: 'biology-3', target: 'biology-5', type: 'smoothstep' },
-
-  // Inter-subject connections
-  { id: 'e-p3-c1', source: 'physics-3', target: 'chemistry-1', type: 'smoothstep' },
-  { id: 'e-c3-b1', source: 'chemistry-3', target: 'biology-1', type: 'smoothstep' },
+  { id: 'e12-13', source: 'life-processes', target: 'heredity', type: 'smoothstep' },
+  { id: 'e13-14', source: 'heredity', target: 'environment', type: 'smoothstep' },
+  { id: 'e14-15', source: 'environment', target: 'human-body', type: 'smoothstep' },
+  { id: 'e15-16', source: 'human-body', target: 'reproduction', type: 'smoothstep' },
+  { id: 'e12-16', source: 'life-processes', target: 'reproduction', type: 'smoothstep' },
+  
+  // Inter-category connections
+  { id: 'e5-7', source: 'electricity', target: 'acids-bases', type: 'smoothstep' },
+  { id: 'e9-12', source: 'carbon-compounds', target: 'life-processes', type: 'smoothstep' },
 ];

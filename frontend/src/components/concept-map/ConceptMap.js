@@ -36,6 +36,7 @@ import 'reactflow/dist/style.css';
 // Import concept map data
 import { scienceNodes, scienceEdges } from '@/data/concept-maps/scienceMap';
 import { mathematicsNodes, mathematicsEdges } from '@/data/concept-maps/mathematicsMap';
+import { englishNodes, englishEdges } from '@/data/concept-maps/englishMap';
 
 // Custom Node Component with category-based styling
 const CustomNode = ({ data, selected }) => {
@@ -55,7 +56,7 @@ const CustomNode = ({ data, selected }) => {
       case 'in-progress': return <Clock className="w-4 h-4 text-blue-600" />;
       case 'weak': return <TrendingUp className="w-4 h-4 text-red-600" />;
       case 'not-started': return <Lock className="w-4 h-4 text-gray-600" />;
-      default: return <BookOpen className="w-4 h-4" />;
+      default: return <BookOpen className="w-4 h-4" />; 
     }
   };
 
@@ -145,6 +146,8 @@ export default function ConceptMap({ subject = 'mathematics' }) {
         return { nodes: scienceNodes, edges: scienceEdges };
       case 'mathematics':
         return { nodes: mathematicsNodes, edges: mathematicsEdges };
+      case 'english':
+        return { nodes: englishNodes, edges: englishEdges };
       default:
         return { nodes: mathematicsNodes, edges: mathematicsEdges };
     }

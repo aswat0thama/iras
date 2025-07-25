@@ -1,7 +1,7 @@
 // Mathematics concept map data for Grade 10 SEE Board
 export const mathematicsNodes = [
   {
-    id: '1',
+    id: 'number-systems',
     type: 'custom',
     position: { x: 400, y: 50 },
     data: { 
@@ -15,7 +15,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '2',
+    id: 'algebra',
     type: 'custom',
     position: { x: 200, y: 150 },
     data: { 
@@ -29,11 +29,11 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '3',
+    id: 'coordinate-geometry',
     type: 'custom',
     position: { x: 600, y: 150 },
     data: { 
-      label: 'Geometry', 
+      label: 'Coordinate Geometry', 
       progress: 40, 
       status: 'in-progress',
       difficulty: 'medium',
@@ -43,7 +43,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '4',
+    id: 'linear-equations',
     type: 'custom',
     position: { x: 100, y: 300 },
     data: { 
@@ -57,7 +57,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '5',
+    id: 'quadratic-equations',
     type: 'custom',
     position: { x: 300, y: 300 },
     data: { 
@@ -71,7 +71,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '6',
+    id: 'triangles',
     type: 'custom',
     position: { x: 500, y: 300 },
     data: { 
@@ -85,7 +85,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '7',
+    id: 'circles',
     type: 'custom',
     position: { x: 700, y: 300 },
     data: { 
@@ -99,7 +99,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '8',
+    id: 'trigonometry',
     type: 'custom',
     position: { x: 200, y: 450 },
     data: { 
@@ -113,7 +113,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '9',
+    id: 'statistics',
     type: 'custom',
     position: { x: 600, y: 450 },
     data: { 
@@ -127,7 +127,7 @@ export const mathematicsNodes = [
     },
   },
   {
-    id: '10',
+    id: 'probability',
     type: 'custom',
     position: { x: 400, y: 550 },
     data: { 
@@ -143,13 +143,13 @@ export const mathematicsNodes = [
 ];
 
 export const mathematicsEdges = [
-  { id: 'e1-2', source: '1', target: '2', type: 'smoothstep' },
-  { id: 'e1-3', source: '1', target: '3', type: 'smoothstep' },
-  { id: 'e2-4', source: '2', target: '4', type: 'smoothstep' },
-  { id: 'e2-5', source: '2', target: '5', type: 'smoothstep' },
-  { id: 'e3-6', source: '3', target: '6', type: 'smoothstep' },
-  { id: 'e3-7', source: '3', target: '7', type: 'smoothstep' },
-  { id: 'e6-8', source: '6', target: '8', type: 'smoothstep' },
-  { id: 'e3-9', source: '3', target: '9', type: 'smoothstep' },
-  { id: 'e9-10', source: '9', target: '10', type: 'smoothstep' },
+  { id: 'e1-2', source: 'number-systems', target: 'algebra', type: 'smoothstep' },
+  { id: 'e1-3', source: 'number-systems', target: 'coordinate-geometry', type: 'smoothstep' },
+  { id: 'e2-4', source: 'algebra', target: 'linear-equations', type: 'smoothstep' },
+  { id: 'e2-5', source: 'algebra', target: 'quadratic-equations', type: 'smoothstep' },
+  { id: 'e3-6', source: 'coordinate-geometry', target: 'triangles', type: 'smoothstep' },
+  { id: 'e3-7', source: 'coordinate-geometry', target: 'circles', type: 'smoothstep' },
+  { id: 'e6-8', source: 'triangles', target: 'trigonometry', type: 'smoothstep' },
+  { id: 'e3-9', source: 'coordinate-geometry', target: 'statistics', type: 'smoothstep' },
+  { id: 'e9-10', source: 'statistics', target: 'probability', type: 'smoothstep' },
 ];
