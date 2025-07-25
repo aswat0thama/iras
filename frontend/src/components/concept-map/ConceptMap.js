@@ -146,12 +146,9 @@ export default function ConceptMap({ subject = 'mathematics' }) {
     case 'science':
       return { nodes: scienceNodes, edges: scienceEdges };
     case 'mathematics':
-      case 'english':
-      return { nodes: englishNodes, edges: englishEdges };
-    case 'mathematics':
       return { nodes: mathematicsNodes, edges: mathematicsEdges };
-    case 'optional-mathematics':
-      return { nodes: optionalMathematicsNodes, edges: optionalMathematicsEdges };
+    case 'english':
+      return { nodes: englishNodes, edges: englishEdges };
     default:
       return { nodes: mathematicsNodes, edges: mathematicsEdges };
   }
