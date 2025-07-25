@@ -37,6 +37,7 @@ import 'reactflow/dist/style.css';
 import { scienceNodes, scienceEdges } from '@/data/concept-maps/scienceMap';
 import { mathematicsNodes, mathematicsEdges } from '@/data/concept-maps/mathematicsMap';
 import { englishNodes, englishEdges } from '@/data/concept-maps/englishMap';
+import { optionalMathematicsNodes, optionalMathematicsEdges } from '@/data/concept-maps/optionalMathematicsMap';
 
 // Custom Node Component with category-based styling
 const CustomNode = ({ data, selected }) => {
@@ -140,18 +141,21 @@ const nodeTypes = {
 
 export default function ConceptMap({ subject = 'mathematics' }) {
   // Get appropriate nodes and edges based on subject - moved to useCallback
-  const getSubjectData = useCallback(() => {
-    switch (subject) {
-      case 'science':
-        return { nodes: scienceNodes, edges: scienceEdges };
-      case 'mathematics':
-        return { nodes: mathematicsNodes, edges: mathematicsEdges };
+ const getSubjectData = useCallback(() => {
+  switch (subject) {
+    case 'science':
+      return { nodes: scienceNodes, edges: scienceEdges };
+    case 'mathematics':
       case 'english':
-        return { nodes: englishNodes, edges: englishEdges };
-      default:
-        return { nodes: mathematicsNodes, edges: mathematicsEdges };
-    }
-  }, [subject]);
+      return { nodes: englishNodes, edges: englishEdges };
+    case 'mathematics':
+      return { nodes: mathematicsNodes, edges: mathematicsEdges };
+    case 'optional-mathematics':
+      return { nodes: optionalMathematicsNodes, edges: optionalMathematicsEdges };
+    default:
+      return { nodes: mathematicsNodes, edges: mathematicsEdges };
+  }
+}, [subject]);
 
   const { nodes: initialNodes, edges: initialEdges } = getSubjectData();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
