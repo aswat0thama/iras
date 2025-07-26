@@ -24,6 +24,7 @@ urlpatterns = [
     
     # Add curriculum API
     path('api/curriculum/', include('curriculum.urls')),
+    path('api/questions/', include('questions.urls')),
 ]
 
 # Serve media files in development
